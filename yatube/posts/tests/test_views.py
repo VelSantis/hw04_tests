@@ -74,7 +74,7 @@ class PostURLTests(TestCase):
         )
         self.assertIn('author', response.context)
         self.assertEqual(response.context['author'], self.user)
-        self.assertIn('posts', response.context)
+        self.assertIn('post', response.context)
         self.assertIn('posts_count', response.context)
         self.assertIn('page_obj', response.context)
         self.assertEqual(response.context['author'], self.user)
