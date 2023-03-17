@@ -59,7 +59,7 @@ class PostURLTests(TestCase):
     def test_group_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:group_list', {'slug': 'test-slug'})
+            reverse('posts:group_list', kwargs={'slug': 'test-slug'})
         )
         self.assertIn('group', response.context)
         self.assertEqual(response.context['group'], self.group)
@@ -70,7 +70,7 @@ class PostURLTests(TestCase):
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:profile', {'username': 'Tanos'})
+            reverse('posts:profile', kwargs={'username': 'Tanos'})
         )
         self.assertIn('author', response.context)
         self.assertEqual(response.context['author'], self.user)
@@ -82,7 +82,7 @@ class PostURLTests(TestCase):
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:post_detail', {'post_id': (self.post.pk)})
+            reverse('posts:post_detail', kwargs={'post_id': (self.post.pk)})
         )
         self.assertIn('post', response.context)
         self.assertIn('posts_count', response.context)
