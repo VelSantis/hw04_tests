@@ -9,19 +9,15 @@ class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Создаем неавторизованный клиент
         cls.guest_client = Client()
-        # Создаем авторизованый клиент
         cls.user = User.objects.create(username='Tanos')
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
-        # Создадим пост в БД
         cls.post = Post.objects.create(
             text='Тестовая запись',
             author=cls.user,
             id=1,
         )
-        # Создадим группу в БД
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -67,8 +63,6 @@ class PostURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Шаблоны по адресам
-
         templates_url_names = {
             '/': 'posts/index.html',
             '/group/test-slug/': 'posts/group_list.html',

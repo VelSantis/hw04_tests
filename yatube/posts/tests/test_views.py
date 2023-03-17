@@ -12,52 +12,45 @@ class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Создаем неавторизованный клиент
         cls.guest_client = Client()
-        # Создаем авторизованый клиент
         cls.user = User.objects.create(username='Tanos')
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.first_user)
-        # Создадим группу в БД
         cls.group = Group.objects.create(
             title='Первая группа',
             slug='test-slug',
             description='Описание группы'
         )
-        # Создадим 13 постов в группе БД
         for post in range(13):
             cls.post = Post.objects.create(
                 text='Записи первой группы',
                 author=cls.user,
                 group=cls.group
             )
-    # Проверяем используемые шаблоны
+
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
         templates_pages_names = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': (
-            reverse('posts:group_list', {'slug': 'test-slug'})
+            reverse('posts:index'): 'posts/index.html',
+            reverse('posts:group_list', kwargs={'slug': 'test-slug'}): (
+                'posts/group_list.html'
             ),
-            'posts/profile.html': (
-            reverse('posts:profile', {'username': 'User'})
+            reverse('posts:profile', kwargs={'username': 'User'}): (
+                'posts/profile.html'
             ),
-            'posts/post_detail.html': (
-            reverse('posts:post_detail', {'post_id': 13})
+            reverse('posts:post_detail', kwargs={'post_id': 13}): (
+                'posts/post_detail.html'
             ),
-            'posts/create_post.html': reverse('posts:post_create'),
-            'posts/create_post.html': (
-            reverse('posts:post_edit', {'post_id': 14})
+            reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:post_edit', kwargs={'post_id': 14}): (
+                'posts/create_post.html'
             ),
         }
-        # Проверяем, что при обращении к name вызывается
-        # соответствующий HTML-шаблон
-        for template, reverse_name in templates_pages_names.items():
+        for reverse_name, template in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
-    # Проверка словаря контекста главной страницы
+
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
@@ -85,7 +78,7 @@ class PostURLTests(TestCase):
         self.assertIn('posts_count', response.context)
         self.assertIn('page_obj', response.context)
         self.assertEqual(response.context['author'], self.user)
-        
+
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
@@ -122,12 +115,8 @@ class PostURLTests(TestCase):
 
     def test_paginator_first_page_contains_ten_records(self):
         response = self.guest_client.get(reverse('posts:index'))
-        # Проверка: количество постов из созданной группы
-        # на первой странице равно 10.
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_paginator_second_page_contains_three_records(self):
-        # Проверка: на второй странице должно быть три поста
-        # первой группы и два второй.
         response = self.guest_client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 5)
