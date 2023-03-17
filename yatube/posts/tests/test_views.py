@@ -35,7 +35,7 @@ class PostURLTests(TestCase):
             reverse('posts:group_list', kwargs={'slug': 'test-slug'}): (
                 'posts/group_list.html'
             ),
-            reverse('posts:profile', kwargs={'username': 'User'}): (
+            reverse('posts:profile', kwargs={'username': 'Tanos'}): (
                 'posts/profile.html'
             ),
             reverse('posts:post_detail', kwargs={'post_id': 13}): (
@@ -70,7 +70,7 @@ class PostURLTests(TestCase):
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:profile', {'username': 'User'})
+            reverse('posts:profile', {'username': 'Tanos'})
         )
         self.assertIn('author', response.context)
         self.assertEqual(response.context['author'], self.user)
@@ -119,4 +119,4 @@ class PostURLTests(TestCase):
 
     def test_paginator_second_page_contains_three_records(self):
         response = self.guest_client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 5)
+        self.assertEqual(len(response.context['page_obj']), 3)

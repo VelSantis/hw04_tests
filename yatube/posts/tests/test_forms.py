@@ -43,7 +43,6 @@ class PostCreateFormTests(TestCase):
             'posts:profile', kwargs={'username': PostCreateFormTests.user})
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        # Проверяем, что создалась запись с нашим слагом
         self.assertTrue(
             Post.objects.filter(
                 group=PostCreateFormTests.group,
