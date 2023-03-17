@@ -10,9 +10,9 @@ class PostModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create_user(username='Tanos')
         cls.post = Post.objects.create(
-            text='Тестовый текст больше 15 символов для проверки...',
+            text='Текст в котором много много символов для теста.',
             author=cls.user,
         )
 
@@ -25,7 +25,7 @@ class GroupModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create_user(username='Tanos')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='Тестовый слаг',
