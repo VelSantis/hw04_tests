@@ -18,7 +18,7 @@ class PostModelTest(TestCase):
 
     def test_post_str(self):
         """Проверка __str__ у post."""
-        self.assertEqual(self.post.text[:15], str(self.post))
+        self.assertEqual(str(self.post), self.post.text[:15])
 
 
 class GroupModelTest(TestCase):
@@ -34,4 +34,4 @@ class GroupModelTest(TestCase):
 
     def test_group_str(self):
         """Проверка __str__ у group."""
-        self.assertEqual(self.group.title, str(self.group))
+        self.assertEqual(str(self.group), self.group.title)
