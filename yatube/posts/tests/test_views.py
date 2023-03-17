@@ -15,7 +15,7 @@ class PostURLTests(TestCase):
         cls.guest_client = Client()
         cls.user = User.objects.create(username='Tanos')
         cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.first_user)
+        cls.authorized_client.force_login(cls.user)
         cls.group = Group.objects.create(
             title='Первая группа',
             slug='test-slug',
