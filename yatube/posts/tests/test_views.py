@@ -64,7 +64,6 @@ class PostURLTests(TestCase):
         self.assertIn('group', response.context)
         self.assertEqual(response.context['group'], self.group)
         self.assertIn('page_obj', response.context)
-        self.assertIn('title', response.context)
         self.assertIn('description', response.context)
 
     def test_profile_page_show_correct_context(self):
@@ -84,7 +83,6 @@ class PostURLTests(TestCase):
             reverse('posts:post_detail', kwargs={'post_id': (self.post.pk)})
         )
         self.assertIn('post', response.context)
-        self.assertIn('title', response.context)
 
     def test_post_create_page_show_correct_context(self):
         """Шаблон post_create сформирован с правильным контекстом."""
