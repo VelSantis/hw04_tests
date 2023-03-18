@@ -64,7 +64,7 @@ class PostURLTests(TestCase):
         self.assertIn('group', response.context)
         self.assertEqual(response.context['group'], self.group)
         self.assertIn('page_obj', response.context)
-        page_obj=response.context['page_obj']
+        page_obj = response.context['page_obj']
         self.assertEqual(len(page_obj), 10)
 
     def test_profile_page_show_correct_context(self):
