@@ -23,7 +23,7 @@ class PostURLTests(TestCase):
         )
         for post in range(13):
             cls.post = Post.objects.create(
-                text='Записи первой группы',
+                text='Записи группы',
                 author=cls.user,
                 group=cls.group
             )
@@ -42,7 +42,7 @@ class PostURLTests(TestCase):
                 'posts/post_detail.html'
             ),
             reverse('posts:post_create'): 'posts/create_post.html',
-            reverse('posts:post_edit', kwargs={'post_id': 14}): (
+            reverse('posts:post_edit', kwargs={'post_id': 1}): (
                 'posts/create_post.html'
             ),
         }
@@ -64,7 +64,8 @@ class PostURLTests(TestCase):
         self.assertIn('group', response.context)
         self.assertEqual(response.context['group'], self.group)
         self.assertIn('page_obj', response.context)
-        self.assertIn('description', response.context)
+        page_obj=response.context['page_obj']
+        self.assertEqual(len(page_obj), 10)
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
