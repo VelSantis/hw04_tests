@@ -68,8 +68,8 @@ class PostURLTests(TestCase):
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
                 self.assertRedirects(response,
-                                     reverse('users:login') + '?next = '
-                                     + address)
+                                     reverse
+                                     ('users:login') + '?next=' + address)
 
     def test_bad_user_redirect_on_edit(self):
         """Проверяем переадресацию для авторизованного пользователя
