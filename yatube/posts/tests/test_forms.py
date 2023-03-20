@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -11,10 +9,7 @@ class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.guest_client = Client()
         cls.user = User.objects.create_user(username='user')
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -25,7 +20,12 @@ class PostCreateFormTests(TestCase):
             author=cls.user,
             group=cls.group
         )
-        cls.form = PostForm()
+
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
 
     def test_create_post(self):
         """Валидная форма создает запись"""
@@ -53,46 +53,56 @@ class PostCreateFormTests(TestCase):
 
     def test_guest_create_post(self):
         """Создание записи только после авторизации"""
+        post_count = Post.objects.count()
         form_data = {
             'text': 'Тестовый пост от неавторизованного пользователя',
             'group': self.group.pk,
         }
-        self.guest_client.post(
+        Post.objects.create(
+            text='Тестовый пост',
+            group=Group.objects.get(title='Тестовая группа'),
+            author=self.user
+        )
+        response = self.guest_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True,
         )
+        self.assertRedirects(response,
+                            f'{reverse("users:login")}?next=/create/')
         self.assertFalse(
             Post.objects.filter(
                 text='Тестовый пост от неавторизованного пользователя'
             ).exists()
         )
+        self.assertEqual(Post.objects.count(), post_count + 1)
 
     def test_authorized_edit_post(self):
         """Редактирование записи создателем поста"""
+        posts_count = Post.objects.count()
         form_data = {
-            'text': 'Тестовый текст',
-            'group': self.group.pk,
+            'text': 'Изменённый текст',
+            'group': self.group.id
         }
-        self.authorized_client.post(
-            reverse('posts:post_create'),
-            data=form_data,
-            follow=True,
-        )
-        post_edit = Post.objects.get(pk=self.group.pk)
-        self.client.get(f'/posts/{post_edit.pk}/edit/')
-        form_data = {
-            'text': 'Измененный пост',
-            'group': self.group.pk
-        }
-        response_edit = self.authorized_client.post(
+        response = self.authorized_client.post(
             reverse('posts:post_edit',
-                    kwargs={
-                        'post_id': post_edit.pk
-                    }),
+            kwargs={'post_id': self.post.id}),
             data=form_data,
-            follow=True,
+            follow=True
         )
-        post_edit = Post.objects.get(pk=self.group.pk)
-        self.assertEqual(response_edit.status_code, HTTPStatus.OK)
-        self.assertEqual(post_edit.text, 'Измененный пост')
+        self.assertRedirects(response, reverse(
+            'posts:post_detail',
+            kwargs={'post_id': self.post.id},
+        ))
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertEqual(
+            Post.objects.get(id=self.post.id).text,
+            form_data['text'],
+        )
+        self.assertEqual(
+            Post.objects.get(id=self.post.id).group.id,
+            form_data['group'],
+        )
+        self.assertEqual(
+            Post.objects.get(id=self.post.id).author, self.user
+        )
