@@ -31,12 +31,10 @@ class PostURLTests(TestCase):
             f'/profile/{cls.post.author}/': 'posts/profile.html',
             f'/posts/{cls.post.id}/': 'posts/post_detail.html',
         }
-
         cls.private_urls = {
             '/create/': 'posts/create_post.html',
             '/posts/1/edit/': 'posts/create_post.html',
         }
-            
         cls.all_urls = {
             **cls.public_urls, **cls.private_urls
         }
@@ -63,14 +61,23 @@ class PostURLTests(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_private_urls_redirect_guest(self):
-        """Проверяем переадресацию для анонимного пользователя с приватных страниц."""
+        """Проверяем переадресацию для анонимного
+        пользователя с приватных страниц.
+        """
         for address in PostURLTests.private_urls:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
-                self.assertRedirects(response, reverse('users:login')+'?next='+address)
+                self.assertRedirects(response,
+                                     reverse('users:login') + '?next = '
+                                     + address)
 
     def test_bad_user_redirect_on_edit(self):
-        """Проверяем переадресацию для авторизованного пользователя при редактировании чужого поста."""
+        """Проверяем переадресацию для авторизованного пользователя
+        при редактировании чужого поста.
+        """
         post_id = PostURLTests.post2.id
-        response = self.authorized_client.get(reverse('posts:post_edit', kwargs={'post_id':post_id}))
-        self.assertRedirects(response,reverse('posts:post_detail',args=(post_id,)))
+        response = self.authorized_client.get(
+            reverse('posts:post_edit', kwargs={'post_id': post_id})
+        )
+        self.assertRedirects(response,
+                             reverse('posts:post_detail', args=(post_id,)))

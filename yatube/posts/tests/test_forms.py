@@ -1,7 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.forms import PostForm
 from posts.models import Group, Post, User
 
 
@@ -20,7 +19,6 @@ class PostCreateFormTests(TestCase):
             author=cls.user,
             group=cls.group
         )
-
 
     def setUp(self):
         self.guest_client = Client()
@@ -68,8 +66,9 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True,
         )
-        self.assertRedirects(response,
-                            f'{reverse("users:login")}?next=/create/')
+        self.assertRedirects(
+            response, f'{reverse("users:login")}?next=/create/'
+        )
         self.assertFalse(
             Post.objects.filter(
                 text='Тестовый пост от неавторизованного пользователя'
@@ -86,7 +85,7 @@ class PostCreateFormTests(TestCase):
         }
         response = self.authorized_client.post(
             reverse('posts:post_edit',
-            kwargs={'post_id': self.post.id}),
+                    kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )

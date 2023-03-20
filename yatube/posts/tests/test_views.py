@@ -23,9 +23,9 @@ class PostURLTests(TestCase):
             description='Описание группы 2'
         )
         cls.post = Post.objects.create(
-            author = cls.user,
-            group = cls.group,
-            text = 'Пост номер 1'
+            author=cls.user,
+            group=cls.group,
+            text='Пост номер 1'
         )
 
     def setUp(self):
@@ -85,7 +85,6 @@ class PostURLTests(TestCase):
         self.assertEquals(group.slug, self.group.slug)
         self.assertEquals(group.description, self.group.description)
 
-
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
@@ -142,20 +141,20 @@ class PostURLTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_new_post_is_shown(self):
-        """При создании в группе, то этот пост появляется: 
-        главная страница, 
+        """При создании в группе, то этот пост появляется:
+        главная страница,
         страница выбранной группы,
         профайл пользователя.
         """
         new_post = Post.objects.create(
-            text = 'Новый пост 2',
-            author = self.user,
-            group = self.group,
+            text='Новый пост 2',
+            author=self.user,
+            group=self.group,
         )
         urls = [
             reverse('posts:index'),
-            reverse('posts:profile', kwargs={'username':self.user.username}),
-            reverse('posts:group_list',kwargs={'slug':self.group.slug})
+            reverse('posts:profile', kwargs={'username': self.user.username}),
+            reverse('posts:group_list', kwargs={'slug': self.group.slug})
         ]
         for url in urls:
             with self.subTest(value=url):
@@ -163,12 +162,14 @@ class PostURLTests(TestCase):
                 self.assertIn(new_post, response.context['page_obj'])
 
         response = self.guest_client.get(
-            reverse('posts:group_list',kwargs={'slug':self.group_2.slug})
+            reverse('posts:group_list', kwargs={'slug': self.group_2.slug})
         )
         self.assertNotIn(new_post, response.context['page_obj'])
 
+
 class PaginatorTest(TestCase):
     SECOND_PAGE_AMOUNT = PAGE_SIZE // 2
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -181,7 +182,6 @@ class PaginatorTest(TestCase):
 
         batch_size = PAGE_SIZE + cls.SECOND_PAGE_AMOUNT
         posts = []
-        
         for _ in range(batch_size):
             post = Post(
                 text='Записи группы',
@@ -189,7 +189,6 @@ class PaginatorTest(TestCase):
                 group=cls.group
             )
             posts.append(post)
-        
         Post.objects.bulk_create(posts, batch_size)
 
     def setUp(self):
@@ -199,13 +198,14 @@ class PaginatorTest(TestCase):
 
     def test_paginator_first_page_contains_ten_records(self):
         urls = [
-            reverse('posts:index'), 
-            reverse('posts:profile', kwargs={'username':self.user.username}), 
-            reverse('posts:group_list',kwargs={'slug':self.group.slug})
+            reverse('posts:index'),
+            reverse('posts:profile', kwargs={'username': self.user.username}),
+            reverse('posts:group_list', kwargs={'slug': self.group.slug})
         ]
         for url in urls:
             with self.subTest(value=url):
                 response = self.guest_client.get(url)
                 self.assertEqual(len(response.context['page_obj']), PAGE_SIZE)
                 response = self.guest_client.get(url + '?page=2')
-                self.assertEqual(len(response.context['page_obj']), self.SECOND_PAGE_AMOUNT)
+                self.assertEqual(len(response.context['page_obj']),
+                                 self.SECOND_PAGE_AMOUNT)
