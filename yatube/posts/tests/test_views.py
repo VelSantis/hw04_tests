@@ -161,6 +161,15 @@ class PostURLTests(TestCase):
                 response = self.guest_client.get(url)
                 self.assertIn(new_post, response.context['page_obj'])
 
+    def test_new_post_for_your_group(self):
+        """Проверка, что пост не попал в группу,
+        для которой не был предназначен.
+        """
+        new_post = Post.objects.create(
+            text='Новый пост 2',
+            author=self.user,
+            group=self.group,
+        )
         response = self.guest_client.get(
             reverse('posts:group_list', kwargs={'slug': self.group_2.slug})
         )

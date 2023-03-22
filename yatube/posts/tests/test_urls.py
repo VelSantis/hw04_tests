@@ -33,7 +33,7 @@ class PostURLTests(TestCase):
         }
         cls.private_urls = {
             '/create/': 'posts/create_post.html',
-            '/posts/1/edit/': 'posts/create_post.html',
+            f'/posts/{cls.post.id}/edit/': 'posts/create_post.html',
         }
         cls.all_urls = {
             **cls.public_urls, **cls.private_urls
@@ -81,3 +81,8 @@ class PostURLTests(TestCase):
         )
         self.assertRedirects(response,
                              reverse('posts:post_detail', args=(post_id,)))
+        
+    def test_unexisting_page_returns_404(self):
+        """Запрос к несуществующей странице."""
+        response = self.client.get('/unexisting_page/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
