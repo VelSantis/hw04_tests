@@ -81,7 +81,7 @@ class PostURLTests(TestCase):
         )
         self.assertRedirects(response,
                              reverse('posts:post_detail', args=(post_id,)))
-        
+
     def test_unexisting_page_returns_404(self):
         """Запрос к несуществующей странице."""
         response = self.client.get('/unexisting_page/')
